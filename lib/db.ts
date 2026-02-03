@@ -4,14 +4,25 @@ let sql: any;
 if (process.env.VERCEL) {
   // Production: Use @vercel/postgres (Vercel's managed Postgres)
   const { sql: vercelSql } = require('@vercel/postgres');
-  sql = vercelSql;
 
-  // Add .begin() wrapper for @vercel/postgres to match postgres.js API
-  sql.begin = async (callback: (tx: any) => Promise<void>) => {
-    // @vercel/postgres doesn't need explicit transactions for single queries
-    // Just execute the callback with sql itself
-    await callback(sql);
+  // Wrap @vercel/postgres to normalize result format to match postgres.js
+  const wrappedSql = async (strings: TemplateStringsArray, ...values: any[]) => {
+    const result = await vercelSql(strings, ...values);
+    // @vercel/postgres returns { rows: [...] }, but we want just the array
+    return result.rows;
   };
+
+  // Preserve tagged template literal functionality
+  Object.setPrototypeOf(wrappedSql, Function.prototype);
+
+  // Add .begin() wrapper for transactions
+  wrappedSql.begin = async (callback: (tx: any) => Promise<void>) => {
+    // @vercel/postgres doesn't need explicit transactions for single queries
+    // Just execute the callback with the wrapped sql itself
+    await callback(wrappedSql);
+  };
+
+  sql = wrappedSql;
 } else {
   // Local development: Use postgres.js
   const postgres = require('postgres');

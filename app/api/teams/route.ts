@@ -16,8 +16,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Session ID and teams array are required' }, { status: 400 });
     }
 
-    const addedTeams = [];
-    const errors = [];
+    const addedTeams: any[] = [];
+    const errors: string[] = [];
 
     for (const team of teams) {
       try {

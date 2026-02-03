@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Rubric is locked' }, { status: 400 });
     }
 
-    const addedCriteria = [];
+    const addedCriteria: any[] = [];
 
     // Use transaction for inserting all criteria
     await sql.begin(async (tx: typeof sql) => {

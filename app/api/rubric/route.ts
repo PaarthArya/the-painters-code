@@ -29,10 +29,10 @@ export async function POST(request: Request) {
     const addedCriteria = [];
 
     // Use transaction for inserting all criteria
-    await sql.begin(async sql => {
+    await sql.begin(async tx => {
       for (let i = 0; i < criteria.length; i++) {
         const criterion = criteria[i];
-        const result = await sql`
+        const result = await tx`
           INSERT INTO rubric_criteria (session_id, name, description, max_score, weight, order_index)
           VALUES (${sessionId}, ${criterion.name}, ${criterion.description || ''}, ${criterion.maxScore}, ${criterion.weight || 100}, ${i})
           RETURNING *

@@ -21,10 +21,10 @@ export async function POST(request: Request) {
 
     // Use transaction for all grade updates + feedback
     try {
-      await sql.begin(async sql => {
+      await sql.begin(async tx => {
         // Insert or update grades
         for (const grade of grades) {
-          const existingResult = await sql`
+          const existingResult = await tx`
             SELECT id, score FROM grades
             WHERE presentation_id = ${presentationId} AND criterion_id = ${grade.criterionId}
           `;
@@ -32,20 +32,20 @@ export async function POST(request: Request) {
           if (existingResult.length > 0) {
             const oldGrade = existingResult[0];
             // Create audit entry
-            await sql`
+            await tx`
               INSERT INTO grade_audit (grade_id, old_score, new_score)
               VALUES (${oldGrade.id}, ${oldGrade.score}, ${grade.score})
             `;
 
             // Update grade
-            await sql`
+            await tx`
               UPDATE grades
               SET score = ${grade.score}, updated_at = CURRENT_TIMESTAMP
               WHERE id = ${oldGrade.id}
             `;
           } else {
             // Insert new grade
-            await sql`
+            await tx`
               INSERT INTO grades (presentation_id, criterion_id, score)
               VALUES (${presentationId}, ${grade.criterionId}, ${grade.score})
             `;
@@ -53,12 +53,12 @@ export async function POST(request: Request) {
         }
 
         // Insert or update feedback
-        const existingFeedbackResult = await sql`
+        const existingFeedbackResult = await tx`
           SELECT id FROM feedback WHERE presentation_id = ${presentationId}
         `;
 
         if (existingFeedbackResult.length > 0) {
-          await sql`
+          await tx`
             UPDATE feedback
             SET public_feedback = ${publicFeedback || ''},
                 private_notes = ${privateNotes || ''},
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
             WHERE presentation_id = ${presentationId}
           `;
         } else {
-          await sql`
+          await tx`
             INSERT INTO feedback (presentation_id, public_feedback, private_notes)
             VALUES (${presentationId}, ${publicFeedback || ''}, ${privateNotes || ''})
           `;

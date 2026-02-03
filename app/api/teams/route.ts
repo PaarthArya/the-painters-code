@@ -33,9 +33,9 @@ export async function POST(request: Request) {
         }
 
         // Use transaction for team + presentation creation
-        await sql.begin(async sql => {
+        await sql.begin(async tx => {
           // Insert team
-          const teamResult = await sql`
+          const teamResult = await tx`
             INSERT INTO teams (session_id, name, members, status)
             VALUES (${sessionId}, ${team.name}, ${JSON.stringify(team.members)}, 'pending')
             RETURNING *
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
           addedTeams.push(newTeam);
 
           // Create a presentation record for this team
-          await sql`
+          await tx`
             INSERT INTO presentations (session_id, team_id, status)
             VALUES (${sessionId}, ${newTeam.id}, 'not_started')
           `;

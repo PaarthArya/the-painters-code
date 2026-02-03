@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     const addedCriteria = [];
 
     // Use transaction for inserting all criteria
-    await sql.begin(async tx => {
+    await sql.begin(async (tx: typeof sql) => {
       for (let i = 0; i < criteria.length; i++) {
         const criterion = criteria[i];
         const result = await tx`

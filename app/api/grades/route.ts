@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
     // Use transaction for all grade updates + feedback
     try {
-      await sql.begin(async tx => {
+      await sql.begin(async (tx: typeof sql) => {
         // Insert or update grades
         for (const grade of grades) {
           const existingResult = await tx`

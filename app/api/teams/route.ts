@@ -33,7 +33,7 @@ export async function POST(request: Request) {
         }
 
         // Use transaction for team + presentation creation
-        await sql.begin(async tx => {
+        await sql.begin(async (tx: typeof sql) => {
           // Insert team
           const teamResult = await tx`
             INSERT INTO teams (session_id, name, members, status)

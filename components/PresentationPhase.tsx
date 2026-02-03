@@ -259,21 +259,21 @@ export default function PresentationPhase({
     setIsRunning(true);
     setSavedTimerState(null);
 
-    // Update presentation status to in_progress
+    // Update presentation status to presenting (reset timer)
     if (activePresentation) {
       await fetch('/api/presentations', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           presentationId: activePresentation.id,
-          status: 'in_progress',
+          status: 'presenting',
           timerState: { phase: 'presentation', elapsedTime: 0 }
         })
       });
 
       // Update parent state
       if (activeTeam) {
-        onTeamSelected(activeTeam, { ...activePresentation, status: 'in_progress' });
+        onTeamSelected(activeTeam, { ...activePresentation, status: 'presenting' });
       }
     }
   };

@@ -288,7 +288,7 @@ export default function PresentationPhase({
 
   const handleEmergencyStop = async () => {
     setIsRunning(false);
-    setTimerPhase(null);  // Clear timerPhase to prevent initial buttons from showing
+    // Keep timerPhase as 'presentation' or 'qa' - don't clear it
     if (activePresentation) {
       await saveTimerState(elapsedTime);
       await fetch('/api/presentations', {
@@ -617,7 +617,7 @@ export default function PresentationPhase({
               </>
             )}
 
-            {!timerPhase && !savedTimerState && (
+            {!timerPhase && !savedTimerState && activePresentation?.status !== 'emergency_stopped' && (
               <>
                 <button
                   onClick={handleStartPresentation}

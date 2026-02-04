@@ -55,7 +55,7 @@ A command center dashboard for university instructors to manage high-stakes stud
 
 ## Production Deployment
 
-**Live URL**: [Deployed on Vercel](the-painters-code-deploy.vercel.app)
+**Live URL**: [Deployed on Vercel](https://the-painters-code-deploy.vercel.app/)
 
 ## Getting Started (Local Development)
 
